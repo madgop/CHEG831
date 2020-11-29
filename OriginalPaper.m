@@ -31,9 +31,9 @@ size(P_Conc_2)
     end
 figure(2)
 hold on
-plot(P_M(:,k),P_t2(:,k))
-ylabel("Pt")
-xlabel("M")
+plot(P_t2(:,k), P_M(:,k))
+ylabel("M")
+xlabel("Pt")
 end
 
 %%Figure3
