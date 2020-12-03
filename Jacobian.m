@@ -2,8 +2,7 @@ function dP = Jacobian(PConc,y)
 % Function to calculate Jacobian of system
 % Inputs: vector of protein concentrations
 % (necessarily at a specific time point)
-% and y (v_d parameter)
-
+% and y (v_s parameter)
 % PConc vector is defined as follows, from original code: 
 % PConc(1): Cytosolic concentration, M
 % PConc(2): Unphosphorylated PER, P0
@@ -11,11 +10,13 @@ function dP = Jacobian(PConc,y)
 % PConc(4): Biphosphorylated PER, P2
 % PConc(5): Nuclear PER, PN
 
-v_s=0.76;   % um/hr; accumulation rate of per mRNA in cytosol
-v_m=0.65;   % um/hr; max degradation rate of per mRNA in cytosol
+PConc = PConc(:)';
+
+v_s=y;   % um/hr; accumulation rate of per mRNA in cytosol
+v_m=0.65;      % um/hr; max degradation rate of per mRNA in cytosol
 K_m=0.5;    % um; Michaelis constant for cytosolic per mRNA
 k_s=0.38;   % hr^-1; first-order rate constant for PER synthesis
-v_d=y;      % um/hr; maximum degradation rate of biphosphorylated PER (P2)
+v_d=0.95;  % um/hr; maximum degradation rate of biphosphorylated PER (P2)
 k_1=1.9;    % hr^-1; first-order rate constant for P2 transport into nucleus
 k_2=1.3;    % hr^-1; first-order rate constant for PN transport into cytosol
 K_I=1;      % um; threshold constant for repression
@@ -29,10 +30,10 @@ V_4=2.5;    % um/hr
 n=4;        % [-]; degree of cooperativity
 
 dP = zeros(5,5);
-    for i = 1:length(C)
+    for i = 1:5
         if i == 1
-            dP(i,1) = -v_m*K_m/((K_m*PConc(1))^2);
-            dP(i,5) = -(v_s*K_I^n)/((K_I^n+PConc(5)^n)^2);
+            dP(i,1) = -v_m*K_m/((K_m+PConc(1))^2);
+            dP(i,5) = -(v_s*K_I^n)*n*(PConc(5))^(n-1)/((K_I^n+PConc(5)^n)^2);
         elseif i == 2
             dP(i,1) = k_s;
             dP(i,2) = -(V_1*K_14)/((K_14+PConc(2))^2);
