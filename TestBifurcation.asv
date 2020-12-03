@@ -36,30 +36,29 @@ dfdv_s = @(P_conc,v_s) [-n*K_I^n*P_conc(5)^(n-1)/(P_conc(5)^n+K_I^n)^2;0;0;0;0];
 
 %% Bifurcation Algorithm
 v_s = [0.01:0.01:5];
-k = 1;
-i = 1;
+count = 1;
+count1 = 1;
 [t,P_Conc] = ode45(@(t,P)getC(t,P,v_s(1)),[0,1000],[0.6;0.5;1.8;0.65;1.2]);
 P_array(:,1) = P_Conc(end,:);
 for j=2:length(v_s)
     Jacob = Jacobian(P_array(:,j-1),v_s(j-1));
     eigJacob(:,j) = eig(Jacob);
     detJacob = abs(det(Jacob));
-    if detJacob < 1e-4
-        tp(k) = j;
-        k = k+1;
+    if detJacob < 1e-5
+        tp(count) = j;
+        count = count+1;
         break
     end
-    if abs(real(eigJacob(1)))<1e-4 || abs(real(eigJacob(2)))<1e-4 || abs(real(eigJacob(3)))<1e-4 || abs(real(eigJacob(4)))<1e-4 || abs(real(eigJacob(5)))<1e-4
-        hopfBif(i) = j;
-        i = i + 1;
+    if abs(real(eigJacob(1)))<1e-5 || abs(real(eigJacob(2)))<1e-5 || abs(real(eigJacob(3)))<1e-5 || abs(real(eigJacob(4)))<1e-5 || abs(real(eigJacob(5)))<1e-5
+        hopfBif(count1) = j;
+        count1 = count1 + 1;
     end
     delF = dfdv_s(P_array(:,j-1),v_s(j-1));
     dzdp = -inv(Jacob)*delF;
     P_array(:,j) = P_array(:,j-1)+dzdp*(v_s(j)-v_s(j-1));
-    Jacob1 = det(Jacobian(P_array(:,j),v_s(j)));
-    [xsol, iter] = Newton(@(P,y) f(P,v_s(j)), @(PConc,y) jac(PConc,v_s(j)), P_array(:,j), 2000, 1e-6);
+    [xsol, iter] = Newton(@(P,y) f(P,v_s(j)), @(PConc,y) jac(PConc,v_s(j)), P_array(:,j), 20, 1e-6);
     P_array(:,j) = xsol;
-    k = k + 1;
+    count = count + 1;
 end
 
 %% Function that Returns concentrations
