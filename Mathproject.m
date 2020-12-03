@@ -12,7 +12,7 @@ init_1=[0.1 0.25 0.25 0.25 0.25;...
 % Figure 1 (Figure 2 of paper)
 
 % Format for ode solver is oe45(function, time_span, initial_cond)
-[t,P_Conc] = ode45(@(t,P)getC(t,P,0.9),[0,1000],[0.6;0.5;1.8;0.65;1.2]);
+[t,P_Conc] = ode45(@(t,P)getC(t,P,0.65),[0,1000],[0.6;0.5;1.8;0.65;1.2]);
 [rows,columns]=size(P_Conc);
 for j=1:rows
     P_t(j,1)=(sum(P_Conc(j,2:5)));  % Total PER protein, eq. 2 in paper

@@ -24,21 +24,19 @@ f = @(P,y) [y*(K_I.^n/(K_I.^n+P(5).^n))-v_m*(P(1)/(K_m+P(1)));
     V_3*(P(3)/(K_14+P(3)))-V_4*(P(4)/(K_14+P(4)))-k_1*P(4)+k_2*P(5)-v_d*(P(4)/(K_d+P(4)));
     k_1*P(4)-k_2*P(5)];
 %jac is an anonymous Jacobian for the concentrations as defined in the paper
-jac = @(PConc,y) [-v_m.*K_m./((K_m.*PConc(1)).^2) 0 0 0 -(y.*K_I.^n)./((K_I.^n+PConc(5).^n).^2);
+jac = @(PConc,y) [-v_m.*K_m./((K_m+PConc(1)).^2) 0 0 0 -(y.*K_I^n)*n*(PConc(5)).^(n-1)./((K_I.^n+PConc(5).^n).^2);
     k_s -(V_1*K_14)./((K_14+PConc(2)).^2) V_2*K_14./((K_14+PConc(3)).^2) 0 0;
     0 (V_1.*K_14)/((K_14+PConc(2)).^2) (-V_2.*K_14)/((K_14+PConc(3)).^2) - (V_3.*K_14)./((K_14+PConc(3)).^2) (V_4.*K_14)./((K_14+PConc(4)).^2) 0;
     0 0 V_3.*K_14./((K_14+PConc(3)).^2) (-V_4.*K_14./((K_14+PConc(4)).^2)-k_1 - v_d.*K_d./((K_d+PConc(4)).^2)) k_2;
     0 0 0 k_1 -k_2];
 %this is the df/dp vector that we solve for in parametric continuation
-dfdv_s = @(P_conc,v_s) [-n*K_I^n*P_conc(5)^(n-1)/(P_conc(5)^n+K_I^n)^2;0;0;0;0];
-
-
+dfdv_s = @(P_conc,v_s) [K_I^n/(P_conc(5)^n+K_I^n);0;0;0;0];
 
 %% Bifurcation Algorithm
-v_s = [0.01:0.01:5];
+v_s = [0.01:0.0001:3];
 k = 1;
 i = 1;
-[t,P_Conc] = ode45(@(t,P)getC(t,P,v_s(1)),[0,1000],[0.6;0.5;1.8;0.65;1.2]);
+[t,P_Conc] = ode45(@(t,P)getC(t,P,v_s(i)),[0,1000],[0.6;0.5;1.8;0.65;1.2]);
 P_array(:,1) = P_Conc(end,:);
 for j=2:length(v_s)
     Jacob = Jacobian(P_array(:,j-1),v_s(j-1));
@@ -49,7 +47,7 @@ for j=2:length(v_s)
         k = k+1;
         break
     end
-    if abs(real(eigJacob(1)))<1e-4 || abs(real(eigJacob(2)))<1e-4 || abs(real(eigJacob(3)))<1e-4 || abs(real(eigJacob(4)))<1e-4 || abs(real(eigJacob(5)))<1e-4
+    if abs(real(eigJacob(1,j)))<1e-4 || abs(real(eigJacob(2,j)))<1e-4 || abs(real(eigJacob(3,j)))<1e-4 || abs(real(eigJacob(4,j)))<1e-4 || abs(real(eigJacob(5,j)))<1e-4
         hopfBif(i) = j;
         i = i + 1;
     end
@@ -57,10 +55,12 @@ for j=2:length(v_s)
     dzdp = -inv(Jacob)*delF;
     P_array(:,j) = P_array(:,j-1)+dzdp*(v_s(j)-v_s(j-1));
     Jacob1 = det(Jacobian(P_array(:,j),v_s(j)));
-    [xsol, iter] = Newton(@(P,y) f(P,v_s(j)), @(PConc,y) jac(PConc,v_s(j)), P_array(:,j), 2000, 1e-6);
+    [xsol, iter] = Newton(@(P,y) f(P,v_s(j)), @(PConc,y) jac(PConc,v_s(j)), P_array(:,j), 10000, 1e-5);
     P_array(:,j) = xsol;
     k = k + 1;
 end
+
+
 
 %% Function that Returns concentrations
 function P_Conc=getC(t,P,y)
@@ -135,8 +135,8 @@ n=4;        % [-]; degree of cooperativity
 dP = zeros(5,5);
     for i = 1:5
         if i == 1
-            dP(i,1) = -v_m*K_m/((K_m*PConc(1))^2);
-            dP(i,5) = -(v_s*K_I^n)/((K_I^n+PConc(5)^n)^2);
+            dP(i,1) = -v_m*K_m/((K_m+PConc(1))^2);
+            dP(i,5) = -(v_s*K_I^n)*n*(PConc(5))^(n-1)/((K_I^n+PConc(5)^n)^2);
         elseif i == 2
             dP(i,1) = k_s;
             dP(i,2) = -(V_1*K_14)/((K_14+PConc(2))^2);
