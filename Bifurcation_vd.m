@@ -1,10 +1,10 @@
 clear all
 %% Constants and Function Definition
-%v_s=y;   % um/hr; accumulation rate of per mRNA in cytosol
+v_d=0.76;   % um/hr; accumulation rate of per mRNA in cytosol
 v_m=0.65;      % um/hr; max degradation rate of per mRNA in cytosol
 K_m=0.5;    % um; Michaelis constant for cytosolic per mRNA
 k_s=0.38;   % hvr^-1; first-order rate constant for PER synthesis
-v_d=0.95;  % um/hr; maximum degradation rate of biphosphorylated PER (P2)
+v_d=y;  % um/hr; maximum degradation rate of biphosphorylated PER (P2)
 k_1=1.9;    % hr^-1; first-order rate constant for P2 transport into nucleus
 k_2=1.3;    % hr^-1; first-order rate constant for PN transport into cytosol
 K_I=1;      % um; threshold constant for repression
@@ -33,13 +33,13 @@ jac = @(PConc,y) [-v_m.*K_m./((K_m+PConc(1)).^2) 0 0 0 -(y.*K_I^n)*n*(PConc(5)).
 dfdv_s = @(P_conc,v_s) [K_I^n/(P_conc(5)^n+K_I^n);0;0;0;0];
 
 %% Bifurcation Algorithm
-v_s = [0.01:0.0001:3];
+v_d = [0.01:0.0001:3];
 k = 1;
 i = 1;
-[t,P_Conc] = ode45(@(t,P)getC(t,P,v_s(i)),[0,1000],[0.6;0.5;1.8;0.65;1.2]);
+[t,P_Conc] = ode45(@(t,P)getC(t,P,v_d(i)),[0,1000],[0.6;0.5;1.8;0.65;1.2]);
 P_array(:,1) = P_Conc(end,:);
-for j=2:length(v_s)
-    Jacob = Jacobian(P_array(:,j-1),v_s(j-1));
+for j=2:length(v_d)
+    Jacob = Jacobian(P_array(:,j-1),v_d(j-1));
     eigJacob(:,j) = eig(Jacob);
     detJacob = abs(det(Jacob));
     if detJacob < 1e-4
@@ -51,11 +51,11 @@ for j=2:length(v_s)
         hopfBif(i) = j;
         i = i + 1;
     end
-    delF = dfdv_s(P_array(:,j-1),v_s(j-1));
+    delF = dfdv_s(P_array(:,j-1),v_d(j-1));
     dzdp = -inv(Jacob)*delF;
-    P_array(:,j) = P_array(:,j-1)+dzdp*(v_s(j)-v_s(j-1));
-    Jacob1 = det(Jacobian(P_array(:,j),v_s(j)));
-    [xsol, iter] = Newton(@(P,y) f(P,v_s(j)), @(PConc,y) jac(PConc,v_s(j)), P_array(:,j), 10000, 1e-5);
+    P_array(:,j) = P_array(:,j-1)+dzdp*(v_d(j)-v_d(j-1));
+    Jacob1 = det(Jacobian(P_array(:,j),v_d(j)));
+    [xsol, iter] = Newton(@(P,y) f(P,v_d(j)), @(PConc,y) jac(PConc,v_d(j)), P_array(:,j), 10000, 1e-5);
     P_array(:,j) = xsol;
     k = k + 1;
 end
@@ -64,19 +64,19 @@ end
 for j=1:col
     P_t(j)=(sum(P_array(2:5,j)));  % Total PER protein, eq. 2 in paper
 end
-vs_stable = v_s(1:hopfBif(end));
+vs_stable = v_d(1:hopfBif(end));
 mConc_stable = P_array(1,(1:hopfBif(end)));
-vs_unstable = v_s(hopfBif(end):end);
+vs_unstable = v_d(hopfBif(end):end);
 mConc_unstable = P_array(1,(hopfBif(end):end));
 pTot_stable = P_t(1,(1:hopfBif(end)));
 pTot_unstable = P_t(hopfBif(end):end);
 
-v_s = [0.65:0.005:3];
-vs_hopf = v_s;
-for i=1:length(v_s)
+v_d = [0.65:0.005:3];
+vs_hopf = v_d;
+for i=1:length(v_d)
     subM=[]; %empty vector that extract the values of M for each iteration around v_s
     subP=[]; %empty vector that extract the values of P_tot for each iteration around v_s
-    [t,P_Conc] = ode45(@(t,P)getC(t,P,v_s(i)),[0,1000],[0.6;0.5;1.8;0.65;1.2]); % get vals
+    [t,P_Conc] = ode45(@(t,P)getC(t,P,v_d(i)),[0,1000],[0.6;0.5;1.8;0.65;1.2]); % get vals
     subM = P_Conc(:,1); %subset only the mRNA data
     subM = subM(round(length(subM)*0.9):end); % find the steady state vals by only extracting the last 10% of timepoints
     max_stable_mrna(i) = max(subM); % find the min mRNA val

@@ -12,11 +12,11 @@ function dP = Jacobian(PConc,y)
 
 PConc = PConc(:)';
 
-v_s=y;   % um/hr; accumulation rate of per mRNA in cytosol
+v_s=0.76;   % um/hr; accumulation rate of per mRNA in cytosol
 v_m=0.65;      % um/hr; max degradation rate of per mRNA in cytosol
 K_m=0.5;    % um; Michaelis constant for cytosolic per mRNA
 k_s=0.38;   % hr^-1; first-order rate constant for PER synthesis
-v_d=0.95;  % um/hr; maximum degradation rate of biphosphorylated PER (P2)
+v_d=y;  % um/hr; maximum degradation rate of biphosphorylated PER (P2)
 k_1=1.9;    % hr^-1; first-order rate constant for P2 transport into nucleus
 k_2=1.3;    % hr^-1; first-order rate constant for PN transport into cytosol
 K_I=1;      % um; threshold constant for repression
