@@ -1,6 +1,6 @@
 clc
 clear all
-init_1=[0.1 0.25 0.25 0.25 0.25;1.9 0.8 0.8 0.8 0.8;0.7 0.5 0.5 0.5 0.5];
+init_1=[0.1 0.25 0.25 0.25 0.25;1.9 0.8 0.8 0.8 0.8;0.7 0.5 0.5 0.5 0.5];   % Eric Git test
 %%Figure1
 [t,P_Conc] = ode45(@(t,P)getC(t,P,0.95),[0,72],[0.6;0.5;1.8;0.65;1.2]);
 
@@ -31,9 +31,9 @@ size(P_Conc_2)
     end
 figure(2)
 hold on
-plot(P_t2(:,k), P_M(:,k))
-ylabel("M")
-xlabel("Pt")
+plot(P_M(:,k),P_t2(:,k))
+ylabel("Pt")
+xlabel("M")
 end
 
 %%Figure3
