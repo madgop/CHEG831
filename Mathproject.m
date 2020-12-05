@@ -12,7 +12,7 @@ init_1=[0.1 0.25 0.25 0.25 0.25;...
 % Figure 1 (Figure 2 of paper)
 
 % Format for ode solver is oe45(function, time_span, initial_cond)
-[t,P_Conc] = ode45(@(t,P)getC(t,P,0.65),[0,1000],[0.6;0.5;1.8;0.65;1.2]);
+[t,P_Conc] = ode45(@(t,P)getC(t,P,0.6),[0,1000],[0.6;0.5;1.8;0.65;1.2]);
 [rows,columns]=size(P_Conc);
 for j=1:rows
     P_t(j,1)=(sum(P_Conc(j,2:5)));  % Total PER protein, eq. 2 in paper
@@ -81,77 +81,6 @@ end
 % ylabel("Period(h^-1)")
 % xlabel("V_D")
 % title("Dependence of PER oscillations on the maximum rate of PER degradation")
-
-
-
-%%
-a1stable = [];
-z1stable = [];
-a1unstab = [];
-z1unstab = [];
-
-a2stable = [];
-z2stable = [];
-a2unstab = [];
-z2unstab = [];
-
-a3stable = [];
-z3stable = [];
-a3unstab = [];
-z3unstab = [];
-
-v_s = [0:0.01:5];
-
-% for i = 1:length(v_s)
-%     [t,P_Conc] = ode45(@(t,P)getC(t,P,v_s(i),[0,72],[0.6;0.5;1.8;0.65;1.2]);
-%     J1 = Jacobian(PConc,v_s(i));
-%     eigJ1 = eig(J1);
-%     if (lambdaJ11 < 0) && (lambdaJ12 < 0)
-%         fprintf('SS solution at z=(0,0) is stable for alpha = %d\n', alpha(i))
-%         a1stable = [a1stable, alpha(i)];
-%         z1stable = [z1stable, 0];
-%     elseif (lambdaJ11 > 0) && (lambdaJ12 > 0)
-%         fprintf('SS solution at z=(0,0) is completely unstable for alpha = %d\n', alpha(i))
-%         a1unstab = [a1unstab, alpha(i)];
-%         z1unstab = [z1unstab, 0];
-%     else
-%         fprintf('SS solution at z=(0,0) has a saddle point for alpha = %d\n', alpha(i))
-%         a1unstab = [a1unstab, alpha(i)];
-%         z1unstab = [z1unstab, 0];            
-%     end    
-% lambdaJ21 = 0.5*(tr2+sqrt(tr2^2-4*detJ2));
-% lambdaJ22 = 0.5*(tr2-sqrt(tr2^2-4*detJ2));
-%     if (lambdaJ21 < 0) && (lambdaJ22 < 0)
-%         fprintf('SS solution at z=(1,0) is stable for alpha = %d\n', alpha(i))
-%         a2stable = [a2stable, alpha(i)];
-%         z2stable = [z2stable, 1];
-%     elseif (lambdaJ21 > 0) && (lambdaJ22 > 0)
-%         fprintf('SS solution at z=(1,0) is completely unstable for alpha = %d\n',alpha(i))
-%         a2unstab = [a2unstab, alpha(i)];
-%         z2unstab = [z2unstab, 1];
-%     else
-%         fprintf('SS solution at z=(1,0) has a saddle point for alpha = %d\n',alpha(i))
-%         a2unstab = [a2unstab, alpha(i)];
-%         z2unstab = [z2unstab, 1];
-%     end
-% lambdaJ31 = 0.5*(tr3+sqrt(tr3^2-4*detJ3));
-% lambdaJ32 = 0.5*(tr3-sqrt(tr3^2-4*detJ3));
-%     if (lambdaJ31 < 0) && (lambdaJ31 < 0)
-%         fprintf('SS solution at z=(1/alpha , 1/beta-1/(alpha*beta)) is stable for alpha = %d\n',alpha(i))
-%         a3stable = [a3stable, alpha(i)];
-%         z3stable = [z3stable, 1/alpha(i)];
-%     elseif (lambdaJ31 > 0) && (lambdaJ32 > 0)
-%         fprintf('SS solution at z=(1/alpha , 1/beta-1/(alpha*beta)) is completely unstable for alpha = %d\n',alpha(i))
-%         a3unstab = [a3unstab, alpha(i)];
-%         z3unstab = [z3unstab, 1/alpha(i)];
-%     else
-%         fprintf('SS solution at z=(1/alpha , 1/beta-1/(alpha*beta)) has a saddle point for alpha = %d\n',alpha(i))
-%         a3unstab = [a3unstab, alpha(i)];
-%         z3unstab = [z3unstab, 1/alpha(i)];
-%     end
-% 
-% end
-% 
 
 %%
 function P_Conc=getC(t,P,y)
