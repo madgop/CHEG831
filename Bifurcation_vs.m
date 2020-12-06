@@ -30,7 +30,7 @@ jac = @(PConc,y) [-v_m.*K_m./((K_m+PConc(1)).^2) 0 0 0 -(y.*K_I^n)*n*(PConc(5)).
     0 0 V_3.*K_14./((K_14+PConc(3)).^2) (-V_4.*K_14./((K_14+PConc(4)).^2)-k_1 - v_d.*K_d./((K_d+PConc(4)).^2)) k_2;
     0 0 0 k_1 -k_2];
 %this is the df/dp vector that we solve for in parametric continuation
-dfdv_s = @(P_conc,v_s) [K_I^n/(P_conc(5)^n+K_I^n);0;0;0;0];
+dfdv_s = @(P_conc) [K_I^n/(P_conc(5)^n+K_I^n);0;0;0;0];
 
 %% Bifurcation Algorithm
 v_s = [0.01:0.0001:3];
@@ -51,7 +51,7 @@ for j=2:length(v_s)
         hopfBif(i) = j;
         i = i + 1;
     end
-    delF = dfdv_s(P_array(:,j-1),v_s(j-1));
+    delF = dfdv_s(P_array(:,j-1));
     dzdp = -inv(Jacob)*delF;
     P_array(:,j) = P_array(:,j-1)+dzdp*(v_s(j)-v_s(j-1));
     Jacob1 = det(Jacobian(P_array(:,j),v_s(j)));

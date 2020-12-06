@@ -34,8 +34,8 @@ dfdk_1 = @(P_conc,k_s) [0;0;0;P_conc(4)+k_2*P_conc(5);P_conc(4)];
 
 %% Bifurcation Algorithm
 k_1 = [0.1:0.0001:20];
-k = 1;
 i = 1;
+k = 1;
 [t,P_Conc] = ode45(@(t,P)getC(t,P,k_1(i)),[0,1000],[0.6;0.5;1.8;0.65;1.2]);
 P_array(:,1) = P_Conc(end,:);
 for j=2:length(k_1)
