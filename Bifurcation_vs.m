@@ -115,6 +115,10 @@ xlabel('v_s')
 title('Total Protein Bifurcation Diagram for v_s')
 hold off
 
+%% Limit Cycle
+
+%[t,P1_Conc] = ode45(@(t,P)getC(t,P,),[0,1000],[0.6;0.5;1.8;0.65;1.2]);
+
 function dP = Jacobian(PConc,y)
 % Function to calculate Jacobian of system
 % Inputs: vector of protein concentrations
